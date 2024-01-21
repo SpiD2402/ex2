@@ -3,6 +3,7 @@ package com.codigo.msexamenexp.service.impl;
 import com.codigo.msexamenexp.aggregates.constants.Constants;
 import com.codigo.msexamenexp.aggregates.request.RequestEnterprises;
 import com.codigo.msexamenexp.aggregates.response.ResponseBase;
+import com.codigo.msexamenexp.aggregates.response.ResponseSunat;
 import com.codigo.msexamenexp.config.RedisService;
 import com.codigo.msexamenexp.entity.DocumentsTypeEntity;
 import com.codigo.msexamenexp.entity.EnterprisesEntity;
@@ -161,6 +162,7 @@ class EnterprisesServiceImplTest {
     @Test
     void getEnterpriseTest()
     {
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         EnterprisesTypeEntity type = new EnterprisesTypeEntity();
         DocumentsTypeEntity documentsTypeEntity = new DocumentsTypeEntity();
         boolean isRes = true;
@@ -170,15 +172,78 @@ class EnterprisesServiceImplTest {
         enterprises.setStatus(Constants.STATUS_ACTIVE);
         enterprises.setEnterprisesTypeEntity(type);
         enterprises.setDocumentsTypeEntity(documentsTypeEntity);
+        enterprises.setUserModif(Constants.AUDIT_ADMIN);
+        enterprises.setDateModif(timestamp);
+        EnterprisesEntity bueno = enterprisesService.getEnterprise(requestEnterprises,enterprises,isRes);
+
+
+        assertEquals(bueno.getIdEnterprises(),enterprises.getIdEnterprises());
+        assertEquals(bueno.getNumDocument(),enterprises.getNumDocument());
+
+    }
+
+    @Test
+    void getEnterpriseTestError()
+    {
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        EnterprisesTypeEntity type = new EnterprisesTypeEntity();
+        DocumentsTypeEntity documentsTypeEntity = new DocumentsTypeEntity();
+        boolean isRes = false;
+        EnterprisesEntity enterprises = new EnterprisesEntity();
+        RequestEnterprises requestEnterprises = new RequestEnterprises("7854544","tienda","asda",1,1);
+        enterprises.setNumDocument(requestEnterprises.getNumDocument());
+        enterprises.setStatus(Constants.STATUS_ACTIVE);
+        enterprises.setEnterprisesTypeEntity(type);
+        enterprises.setDocumentsTypeEntity(documentsTypeEntity);
+        enterprises.setUserCreate(Constants.AUDIT_ADMIN);
+        enterprises.setDateCreate(timestamp);
 
         EnterprisesEntity bueno = enterprisesService.getEnterprise(requestEnterprises,enterprises,isRes);
 
         assertEquals(bueno.getIdEnterprises(),enterprises.getIdEnterprises());
         assertEquals(bueno.getNumDocument(),enterprises.getNumDocument());
 
+    }
 
+
+    @Test
+    void deleteTest()
+    {
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+
+        Integer id = 1;
+
+        Optional<EnterprisesEntity>enterprises = Optional.of(new EnterprisesEntity());
+        Mockito.when(enterprisesRepository.findById(id)).thenReturn(enterprises);
+        enterprises.get().setStatus(0);
+        enterprises.get().setStatus(0);
+        enterprises.get().setUserDelete(Constants.AUDIT_ADMIN);
+        enterprises.get().setDateDelete(timestamp);
+        Mockito.when(enterprisesRepository.save(enterprises.get())).thenReturn(enterprises.get());
+
+        ResponseBase esperado = enterprisesService.delete(id);
+
+        assertNotNull(esperado.getData());
 
     }
+
+
+
+    @Test
+    void getEntityTest()
+    {
+
+
+        RequestEnterprises requestEnterprises=new RequestEnterprises();
+
+        EnterprisesEntity entity = new EnterprisesEntity();
+        entity.setBusinessName("responseSunat.getRazonSocial()");
+        entity.setTradeName("responseSunat.getRazonSocial()");
+
+        EnterprisesEntity enterprises= enterprisesService.getEntity(requestEnterprises);
+
+    }
+
 
 
 }

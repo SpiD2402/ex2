@@ -125,10 +125,10 @@ public class EnterprisesServiceImpl implements EnterprisesService {
     }
 
 
-    private EnterprisesEntity getEntity(RequestEnterprises requestEnterprises){
+    public EnterprisesEntity getEntity(RequestEnterprises requestEnterprises){
 
         EnterprisesEntity entity = new EnterprisesEntity();
-        ResponseSunat responseSunat =getExecutionSunat(requestEnterprises.getNumDocument());
+        ResponseSunat responseSunat =getExecutionSunat2(requestEnterprises.getNumDocument());
         if(responseSunat!=null)
         {
             entity.setBusinessName(responseSunat.getRazonSocial());
@@ -188,4 +188,13 @@ public class EnterprisesServiceImpl implements EnterprisesService {
         }
 
     }
-}
+
+
+    public ResponseSunat getExecutionSunat2(String numero){
+
+        String authorization = "Bearer " + tokenSunat;
+        return sunatClient.getInfoSunat(numero, authorization);
+        }
+
+    }
+
